@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>SUPENSION C197</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <div class="bg">
+    <div class="bg-glow glow-1"></div>
+    <div class="bg-glow glow-2"></div>
+  </div>
+
+  <header class="topbar">
+    <div class="brand">
+      <img class="brand-logo" src="https://i.ibb.co/hFB5PxDS/Logo-cuadrado.png" alt="SUPENSION PLUS">
+      <div>
+        <div class="brand-name">Supensión Plus</div>
+        <div class="brand-sub">SUPENSION C197 · Creado por SUPENSION PLUS</div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <a href="#formulario">Estudio</a>
+      <a href="#resultado">Resultado</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="hero-card" id="formulario">
+      <div class="hero-head">
+        <div class="hero-kicker">Guía técnica · Colombia</div>
+        <h1 class="hero-title">Cálculo de Cotizaciones<br><span>Sentencia C-197 de 2023</span></h1>
+        <p class="hero-desc">
+          Estudio preliminar basado en semanas: cumplimiento, proyección hasta edad y
+          estimación del incremento en tasa de reemplazo (según reglas definidas).
+        </p>
+
+        <div class="chips">
+          <span class="chip">⚖️ C-197</span>
+          <span class="chip">👩 Mujeres</span>
+          <span class="chip">🧮 4,29 semanas/mes</span>
+          <span class="chip">🧾 Informe exportable</span>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="field">
+          <label>Firma / Empresa</label>
+          <input id="empresa" placeholder="Ej: SUPENSION PLUS">
+        </div>
+        <div class="field">
+          <label>Responsable</label>
+          <input id="responsable" placeholder="Ej: CESAR CANO">
+        </div>
+
+        <div class="field">
+          <label>Nombre del cliente (opcional)</label>
+          <input id="cliente" placeholder="Ej: JULIA BEDOYA CORTES">
+        </div>
+        <div class="field">
+          <label>Semanas al corte (decimal con punto)</label>
+          <input id="semanasCorte" placeholder="Ej: 1100.12">
+        </div>
+
+        <div class="field">
+          <label>Fecha de nacimiento (DD/MM/AAAA)</label>
+          <input id="fechaNacimiento" placeholder="27/05/1973">
+        </div>
+        <div class="field">
+          <label>Fecha de corte (DD/MM/AAAA)</label>
+          <input id="fechaCorte" placeholder="31/12/2025">
+        </div>
+
+        <div class="field full">
+          <label class="switch-row">
+            <input type="checkbox" id="seguirEdad">
+            <span>Analizar “seguir cotizando hasta la edad” si cumple antes</span>
+          </label>
+        </div>
+
+        <div class="field full">
+          <label>Objetivo principal</label>
+          <div class="objective-cards">
+            <label class="oc">
+              <input type="radio" name="objetivo" value="A">
+              <span><b>A</b> Cumplimiento al llegar a la edad</span>
+            </label>
+            <label class="oc">
+              <input type="radio" name="objetivo" value="B">
+              <span><b>B</b> Semanas faltantes y hasta cuándo cotizar</span>
+            </label>
+            <label class="oc">
+              <input type="radio" name="objetivo" value="C">
+              <span><b>C</b> Incremento si sigue hasta la edad</span>
+            </label>
+            <label class="oc">
+              <input type="radio" name="objetivo" value="D">
+              <span><b>D</b> Otro (nota del objetivo)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="field full" id="wrapObjetivoTexto" style="display:none;">
+          <label>Describe el objetivo (solo si D)</label>
+          <textarea id="objetivoTexto" placeholder="Ej: Estudio para auditoría interna..."></textarea>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" id="btnGenerar">Generar estudio preliminar</button>
+
+        <div class="export">
+          <button class="btn ghost" id="btnExportarJSON" type="button">Exportar JSON</button>
+          <button class="btn ghost" id="btnExportarHTML" type="button">Exportar HTML</button>
+          <button class="btn ghost" id="btnExportarDOCX" type="button">Exportar Word (.docx)</button>
+
+          <label class="btn ghost file">
+            Importar JSON
+            <input type="file" id="btnImportarJSON" accept="application/json">
+          </label>
+        </div>
+      </div>
+
+      <div class="note">
+        <b>Nota:</b> Este estudio no calcula IBL ni mesada; es una proyección técnica por semanas.
+      </div>
+    </section>
+
+<section class="result-card">
+  <div class="result-head">
+    <h2>Resultado</h2>
+    <p>Al generar el estudio, aquí verás el informe preliminar y las tablas.</p>
+  </div>
+  <div class="result-body" id="resultado"></div>
+</section>
+
+  </main>
+
+  <script type="module" src="js/app.js"></script>
+
+  <!-- Mini script para mostrar textarea cuando objetivo sea D -->
+  <script>
+    document.addEventListener("change", (e) => {
+      if (e.target && e.target.name === "objetivo") {
+        const show = e.target.value === "D";
+        document.getElementById("wrapObjetivoTexto").style.display = show ? "block" : "none";
+      }
+    });
+  </script>
+
+</body>
+</html>
