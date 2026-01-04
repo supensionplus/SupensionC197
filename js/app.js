@@ -1,5 +1,5 @@
 import { calcularC197 } from "./domain/calculadora.js";
-import { construirReporteHTML } from "./reportes/builderHTML.js";
+import { construirReporteHTML, renderTabla } from "./reportes/builderHTML.js";
 import { cargarEmpresaYResponsable, guardarEmpresaYResponsable } from "./utils/storage.js";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -31,6 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // 5) Pintar resultado en cards (builder premium)
       const html = construirReporteHTML(informe);
       document.getElementById("resultado").innerHTML = html;
+      activarFiltrosDetalle(informe);
 
     } catch (e) {
       console.error(e);
@@ -132,4 +133,62 @@ function formatDDMMYYYY(d) {
   const mm = String(d.getMonth() + 1).padStart(2, "0");
   const yyyy = d.getFullYear();
   return `${dd}/${mm}/${yyyy}`;
+}
+
+function activarFiltrosDetalle(informe) {
+  const anioSel = document.getElementById("filtroAnio");
+  const mesSel = document.getElementById("filtroMes");
+  const btnClear = document.getElementById("btnLimpiarFiltros");
+
+  // Si todavía no existe (por ejemplo antes de generar), salimos
+  if (!anioSel || !mesSel || !btnClear) return;
+
+  const principal = (informe.tablas?.tablaPrincipal || []);
+  const adicional = (informe.tablas?.tablaAdicional || null);
+
+  // Llenar opciones de año
+  const anios = Array.from(new Set(principal.map(f => f.anio))).sort((a,b)=>a-b);
+  anioSel.innerHTML = `<option value="ALL">Todos</option>` + anios.map(a => `<option value="${a}">${a}</option>`).join("");
+
+  // Llenar meses
+  mesSel.innerHTML = `
+    <option value="ALL">Todos</option>
+    <option value="01">Enero</option><option value="02">Febrero</option><option value="03">Marzo</option>
+    <option value="04">Abril</option><option value="05">Mayo</option><option value="06">Junio</option>
+    <option value="07">Julio</option><option value="08">Agosto</option><option value="09">Septiembre</option>
+    <option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+  `;
+
+  function filtrar(arr) {
+    const anio = anioSel.value;
+    const mes = mesSel.value;
+
+    return arr.filter(f => {
+      const okAnio = (anio === "ALL") ? true : String(f.anio) === anio;
+      const okMes = (mes === "ALL") ? true : String(f.mes).padStart(2, "0") === mes;
+      return okAnio && okMes;
+    });
+  }
+
+  function pintar() {
+    const p = filtrar(principal);
+    document.getElementById("tablaPrincipalWrap").innerHTML = renderTabla(p);
+
+    if (adicional && document.getElementById("tablaAdicionalWrap")) {
+      const a = filtrar(adicional);
+      document.getElementById("tablaAdicionalWrap").innerHTML = renderTabla(a);
+    }
+  }
+
+  anioSel.addEventListener("change", pintar);
+  mesSel.addEventListener("change", pintar);
+
+  btnClear.addEventListener("click", () => {
+    anioSel.value = "ALL";
+    mesSel.value = "ALL";
+    pintar();
+  });
+
+  // Render inicial
+  pintar();
 }
