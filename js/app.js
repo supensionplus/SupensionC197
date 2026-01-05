@@ -2,6 +2,8 @@ import { calcularC197 } from "./domain/calculadora.js";
 import { construirReporteHTML, renderTabla } from "./reportes/builderHTML.js";
 import { cargarEmpresaYResponsable, guardarEmpresaYResponsable } from "./utils/storage.js";
 
+let informeActual = null;
+
 document.addEventListener("DOMContentLoaded", () => {
   // 1) Precargar empresa/responsable desde localStorage
   const saved = cargarEmpresaYResponsable();
@@ -10,34 +12,43 @@ document.addEventListener("DOMContentLoaded", () => {
   if (empresaEl) empresaEl.value = saved.empresa || "";
   if (respEl) respEl.value = saved.responsable || "";
 
-  // 2) Botón generar
-  document.getElementById("btnGenerar").addEventListener("click", () => {
-    try {
-      const caso = leerFormulario();
+// 2) Botón generar
+document.getElementById("btnGenerar").addEventListener("click", () => {
+  try {
+    const caso = leerFormulario();
 
-      // Validación mínima (si falla, alerta y no sigue)
-      const ok = validarCaso(caso);
-      if (!ok) return;
+    // Validación mínima (si falla, alerta y no sigue)
+    const ok = validarCaso(caso);
+    if (!ok) return;
 
-      // Guardar defaults
-      guardarEmpresaYResponsable(caso.empresa, caso.responsable);
+    // Guardar defaults
+    guardarEmpresaYResponsable(caso.empresa, caso.responsable);
 
-      // 3) Calcular
-      const motor = calcularC197(caso);
+    // 3) Calcular
+    const motor = calcularC197(caso);
 
-      // 4) Armar informe (mínimo viable para render premium)
-      const informe = construirInforme(caso, motor);
+    // 4) Armar informe (mínimo viable para render premium)
+    const informe = construirInforme(caso, motor);
 
-      // 5) Pintar resultado en cards (builder premium)
-      const html = construirReporteHTML(informe);
-      document.getElementById("resultado").innerHTML = html;
-      activarFiltrosDetalle(informe);
+    // (opcional pero recomendado) guardar el último informe para exportaciones
+    informeActual = informe;
 
-    } catch (e) {
-      console.error(e);
-      alert("Hubo un error. Abre F12 > Console y copia el error para revisarlo.");
-    }
-  });
+    // 5) Pintar resultado en cards (builder premium)
+    const html = construirReporteHTML(informe);
+
+    // 🔧 clave: limpiar y volver a pintar para que no se "pegue" de renders anteriores
+    const res = document.getElementById("resultado");
+    res.innerHTML = "";
+    res.innerHTML = html;
+
+    // Reactivar filtros con el informe recién pintado
+    activarFiltrosDetalle(informe);
+
+  } catch (e) {
+    console.error(e);
+    alert("Hubo un error. Abre F12 > Console y copia el error para revisarlo.");
+  }
+});
 });
 
 function leerFormulario() {
@@ -192,3 +203,4 @@ function activarFiltrosDetalle(informe) {
   // Render inicial
   pintar();
 }
+
